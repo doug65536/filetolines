@@ -1,0 +1,22 @@
+{
+  "name": "filetolines",
+  "version": "0.0.0",
+  "description": "Asynchronously read a file, split at newlines, get a callback per line",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "nodeunit test"
+  },
+  "keywords": [
+    "file",
+    "to",
+    "lines",
+    "fgets",
+    "get",
+    "lines"
+  ],
+  "author": "A. Douglas Gale",
+  "license": "MIT"
+}

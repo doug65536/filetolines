@@ -3,42 +3,42 @@ var fs = require('fs'),
     fileToLines = require('../lib'),
     test = require('nodeunit');
 
-function testBlockSize(test, path, lines, size, maxSize) {
-    console.log('testing buffer size', size);
+function testBlockSize(test, name, path, lines, size) {
     var lineNumber = 0;
     fileToLines(path, { blockSize: size }, function(err, line) {
         test.ifError(err);
 
-        if (lineNumber < lines.length) {
+        if (err) {
+            return;
+        }
+
+        if (lineNumber < lines.length)
             test.strictEqual(line, lines[lineNumber++]);
-        } else {
+        else {
             test.strictEqual(line, null);
         }
 
         if (line === null) {
-            if (size < maxSize)
-                testBlockSize(test, path, lines, size + 1, maxSize);
-            else {
-                test.done();
-            }
-        }
+            test.done();
+         }
     });
 }
 
 exports.testEmptyFile = function(test) {
-    var path = 'test/empty.txt',
-        lines = [],
+    var path = 'test/0lines.txt',
+        lines = [''],
         minBuffer = 4096,
         maxBuffer = 4096;
-    test.expect(6 * (lines.length + 1));
-    testBlockSize(test, path, lines, minBuffer, maxBuffer);
+    // Expect one callback with an empty string, and one callback with null
+    // Each callback asserts no error and equality to expectation
+    test.expect(4);
+    testBlockSize(test, 'testEmptyFile', path, lines, 1024);
 };
 
-exports.testBlockSizes = function(test) {
+exports.testBlockSizes = function(size, test) {
     var path = 'test/biglog.log',
-        lines = fs.readFileSync(path).toString().split('\n'),
-        minBuffer = 222,
-        maxBuffer = 4096;
-    test.expect(6 * (lines.length + 1));
-    testBlockSize(test, path, lines, minBuffer, maxBuffer);
+        lines = fs.readFileSync(path).toString().split('\n');
+    // Expect ifError and strictEqual per line, plus one for the null EOF callback
+    test.expect(2 * (lines.length + 1));
+    testBlockSize(test, 'testBlockSizes', path, lines, size);
 };
